@@ -57,5 +57,3 @@ echo "Initializing new git repository"
 git init --quiet
 git add -A
 git commit -m "Init" --quiet
-
-exec bash
