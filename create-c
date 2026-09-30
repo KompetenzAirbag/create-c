@@ -1,0 +1,61 @@
+#!/bin/bash
+
+###################################################################
+#                                                                 #
+#   This script clones my c-template into a given directory and   #
+#   automatically changes the name of the executable as well as   #
+#   setup a new git repository                                    #
+#                                                                 #
+###################################################################
+
+dir=""
+name=""
+
+if [ "$#" -eq 1 ]; then
+    arg="$1"
+
+    name=$(basename "$arg")
+
+    if [[ "$arg" == */* ]]; then
+        dir="$arg"
+    else
+        dir="./$arg"
+    fi
+
+elif [ "$#" -eq 2 ]; then
+    dir="$1"
+    name="$2"
+
+else
+    echo "Usage: create-c <path> [name]"
+    exit 1
+fi
+
+echo "Cloning template to $dir"
+git clone https://github.com/KompetenzAirbag/c-template.git "$dir" --quiet
+
+cd $dir
+
+echo "Renaming executable to $name"
+sed -i "s/CHANGE_MY_NAME/$name/g" Makefile
+echo $name >> .gitignore
+
+clean_name="${name//[._-]/ }"
+
+title=""
+for word in $clean_name; do
+    title+="${word^} "
+done
+title="${title% }"
+
+echo "Creating README: $title"
+echo "# $title" > README.md
+
+rm -rf .git
+
+echo "Initializing new git repository"
+git init --quiet
+git add -A
+git commit -m "Init" --quiet
+
+exec bash
